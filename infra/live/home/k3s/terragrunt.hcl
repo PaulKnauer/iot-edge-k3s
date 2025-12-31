@@ -10,7 +10,7 @@ inputs = {
   # SSH
   ssh_user             = "ubuntu"
   ssh_port             = 22
-  ssh_private_key_path = pathexpand("~/.ssh/k3s-homelab")
+  ssh_private_key_path = "~/.ssh/k3s-edge-iot"
 
   # k3s pin (adjust if you want)
   k3s_version = "v1.29.9+k3s1"
