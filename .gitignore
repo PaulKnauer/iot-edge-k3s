@@ -1,0 +1,8 @@
+**/.terraform/*
+**/.terragrunt-cache/*
+*.tfstate
+*.tfstate.*
+kubeconfig*
+*.pem
+*.key
+.DS_Store
