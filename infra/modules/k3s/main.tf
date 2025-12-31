@@ -21,7 +21,7 @@ resource "null_resource" "server_init" {
     endpoint     = var.cluster_endpoint
     disable_trfk = var.disable_traefik ? "1" : "0"
     # Don't include token in triggers
-    script_hash  = filesha256("${path.module}/scripts/install_k3s_server.sh")
+    script_hash = filesha256("${path.module}/scripts/install_k3s_server.sh")
   }
 
   connection {
@@ -136,7 +136,7 @@ resource "null_resource" "fetch_kubeconfig" {
   depends_on = [null_resource.server_init]
 
   provisioner "local-exec" {
-    command = <<EOT
+    command     = <<EOT
 set -euo pipefail
 mkdir -p "$(dirname "${var.kubeconfig_path}")"
 scp -o StrictHostKeyChecking=accept-new -i "${var.ssh_private_key_path}" -P ${var.ssh_port} ${var.ssh_user}@${local.server0}:/etc/rancher/k3s/k3s.yaml "${var.kubeconfig_path}.tmp"
