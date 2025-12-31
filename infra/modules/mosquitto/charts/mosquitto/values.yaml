@@ -1,0 +1,18 @@
+replicaCount: 1
+
+image:
+  repository: eclipse-mosquitto
+  tag: "2.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 1883
+  nodePort: 31883
+
+auth:
+  allowAnonymous: true
+  username: mqtt
+  password: ""
+
+resources: {}
