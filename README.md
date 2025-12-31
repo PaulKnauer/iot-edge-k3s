@@ -2,7 +2,7 @@
 
 ## Prereqs
 - Terragrunt + Terraform installed
-- SSH key created: ~/.ssh/k3s-homelab
+- SSH key created: ~/.ssh/k3s-edge-iot
 - 4x Pis reachable via SSH (user: ubuntu)
 - Hostnames: rpi4-1.local ... rpi4-4.local
 
