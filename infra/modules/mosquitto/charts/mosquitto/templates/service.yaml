@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mosquitto.name" . }}
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: {{ include "mosquitto.name" . }}
+  ports:
+    - name: mqtt
+      port: {{ .Values.service.port }}
+      targetPort: 1883
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}

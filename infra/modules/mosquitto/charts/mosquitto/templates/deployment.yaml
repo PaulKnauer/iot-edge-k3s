@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mosquitto.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "mosquitto.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "mosquitto.name" . }}
+    spec:
+      containers:
+        - name: mosquitto
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 1883
+          volumeMounts:
+            - name: config
+              mountPath: /mosquitto/config/mosquitto.conf
+              subPath: mosquitto.conf
+            - name: passwordfile
+              mountPath: /mosquitto/config/passwordfile
+              subPath: passwordfile
+          command: ["/bin/sh","-lc"]
+          args:
+            - >
+              if [ "{{ .Values.auth.allowAnonymous }}" = "false" ]; then
+                if [ -z "{{ .Values.auth.password }}" ]; then
+                  echo "ERROR: auth.password required when allowAnonymous=false" >&2; exit 1;
+                fi;
+                touch /mosquitto/config/passwordfile;
+                mosquitto_passwd -b -c /mosquitto/config/passwordfile "{{ .Values.auth.username }}" "{{ .Values.auth.password }}";
+              else
+                echo "Anonymous access enabled";
+                touch /mosquitto/config/passwordfile;
+              fi;
+              exec mosquitto -c /mosquitto/config/mosquitto.conf
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "mosquitto.name" . }}-config
+        - name: passwordfile
+          emptyDir: {}

@@ -2,6 +2,7 @@
 **/.terragrunt-cache/*
 *.tfstate
 *.tfstate.*
+infra/.kube/*
 kubeconfig*
 *.pem
 *.key
