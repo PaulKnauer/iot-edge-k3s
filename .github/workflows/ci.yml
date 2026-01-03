@@ -35,7 +35,7 @@ jobs:
       - name: Terragrunt hclfmt (check)
         run: |
           cd infra
-          terragrunt hclfmt --terragrunt-check
+          terragrunt hcl format --check
 
       - name: Terraform validate (k3s)
         run: |

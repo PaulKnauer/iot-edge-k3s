@@ -4,7 +4,7 @@ ROOT=infra
 .PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt destroy-k3s destroy-mqtt
 
 fmt:
-	cd $(ROOT) && $(TERRAGRUNT) hclfmt
+	cd $(ROOT) && $(TERRAGRUNT) hcl format
 	cd $(ROOT) && terraform fmt -recursive
 
 plan-k3s:
