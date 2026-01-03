@@ -23,7 +23,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TG_VERSION="0.67.0"
+          TG_VERSION="0.96.1"
           curl -fsSL -o /usr/local/bin/terragrunt \
             "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64"
           chmod +x /usr/local/bin/terragrunt
