@@ -47,12 +47,12 @@ resource "helm_release" "nodered" {
         size         = var.storage_size
         accessMode   = var.storage_access_mode
       }
-      resources = var.resources
-      podSecurityContext = var.pod_security_context
+      resources                = var.resources
+      podSecurityContext       = var.pod_security_context
       containerSecurityContext = var.container_security_context
-      deploymentStrategy = var.deployment_strategy
+      deploymentStrategy       = var.deployment_strategy
       env = {
-        enableProjects = var.projects_enabled
+        enableProjects       = var.projects_enabled
         credentialSecretName = var.credential_secret_name
         credentialSecretKey  = var.credential_secret_key
       }
