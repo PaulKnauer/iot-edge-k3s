@@ -1,0 +1,35 @@
+replicaCount: 1
+
+image:
+  repository: nodered/node-red
+  tag: "3.1.9"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 1880
+  nodePort: null
+
+persistence:
+  enabled: true
+  storageClass: longhorn
+  size: 2Gi
+  accessMode: ReadWriteOnce
+
+resources: {}
+
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+
+containerSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+
+deploymentStrategy: Recreate
+
+env:
+  enableProjects: true
+  credentialSecretName: nodered-credential-secret
+  credentialSecretKey: credentialSecret
