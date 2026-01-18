@@ -1,7 +1,7 @@
 TERRAGRUNT=terragrunt
 ROOT=infra
 
-.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt destroy-k3s destroy-mqtt
+.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn destroy-k3s destroy-mqtt destroy-longhorn
 
 fmt:
 	cd $(ROOT) && $(TERRAGRUNT) hcl format
@@ -24,3 +24,12 @@ apply-mqtt:
 
 destroy-mqtt:
 	cd $(ROOT)/live/home/mosquitto && $(TERRAGRUNT) destroy
+
+plan-longhorn:
+	cd $(ROOT)/live/home/longhorn && $(TERRAGRUNT) plan
+
+apply-longhorn:
+	cd $(ROOT)/live/home/longhorn && $(TERRAGRUNT) apply
+
+destroy-longhorn:
+	cd $(ROOT)/live/home/longhorn && $(TERRAGRUNT) destroy
