@@ -38,4 +38,16 @@ inputs = {
 
   # Optional: disable bundled addons you don't need
   disable_traefik = true
+
+  # Containerd registry config for local HTTP registry.
+  registries_yaml = <<-EOT
+    mirrors:
+      "192.168.2.201:32000":
+        endpoint:
+          - "http://192.168.2.201:32000"
+    configs:
+      "192.168.2.201:32000":
+        tls:
+          insecure_skip_verify: true
+  EOT
 }

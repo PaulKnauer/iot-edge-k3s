@@ -1,7 +1,7 @@
 TERRAGRUNT=terragrunt
 ROOT=infra
 
-.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn plan-nodered apply-nodered plan-registry apply-registry destroy-k3s destroy-mqtt destroy-longhorn destroy-nodered destroy-registry
+.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn plan-nodered apply-nodered plan-registry apply-registry plan-clock-server apply-clock-server destroy-k3s destroy-mqtt destroy-longhorn destroy-nodered destroy-registry destroy-clock-server
 
 fmt:
 	cd $(ROOT) && $(TERRAGRUNT) hcl format
@@ -51,3 +51,12 @@ apply-registry:
 
 destroy-registry:
 	cd $(ROOT)/live/home/registry && $(TERRAGRUNT) destroy
+
+plan-clock-server:
+	cd $(ROOT)/live/home/clock-server && $(TERRAGRUNT) plan
+
+apply-clock-server:
+	cd $(ROOT)/live/home/clock-server && $(TERRAGRUNT) apply
+
+destroy-clock-server:
+	cd $(ROOT)/live/home/clock-server && $(TERRAGRUNT) destroy

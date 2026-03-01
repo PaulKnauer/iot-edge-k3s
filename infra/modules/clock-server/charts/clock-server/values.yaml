@@ -1,0 +1,18 @@
+replicaCount: 1
+
+image:
+  repository: clock-server
+  tag: "latest"
+  pullPolicy: IfNotPresent
+  imagePullSecretName: ""
+
+env:
+  authSecretName: ""
+  extra: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+  nodePort: null
+
+resources: {}

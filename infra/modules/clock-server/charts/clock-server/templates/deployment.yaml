@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "clock-server.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "clock-server.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "clock-server.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "clock-server.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- if .Values.image.imagePullSecretName }}
+      imagePullSecrets:
+        - name: {{ .Values.image.imagePullSecretName }}
+      {{- end }}
+      containers:
+        - name: clock-server
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.env.authSecretName }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.env.authSecretName }}
+          {{- end }}
+          {{- if .Values.env.extra }}
+          env:
+            {{- range $key, $value := .Values.env.extra }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              name: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

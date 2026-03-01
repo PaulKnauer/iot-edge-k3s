@@ -11,6 +11,7 @@ make apply-k3s
 make apply-longhorn
 make apply-registry
 make apply-mqtt
+make apply-clock-server
 
 ## Verify
 - kubeconfig written to: infra/.kube/home-k3s.yaml
@@ -19,6 +20,8 @@ make apply-mqtt
   - registry: `<any-node-ip>:32000`
 - Mosquitto NodePort default: 31883
   - broker: <any-node-ip>:31883
+- Clock server NodePort default: 31881
+  - app: <any-node-ip>:31881
 
 ## Push Images To Local Registry
 - Optional (recommended): enable registry auth before apply
@@ -30,6 +33,7 @@ make apply-mqtt
   - `docker push <any-node-ip>:32000/alpine:3.20`
 
 ## Destroy
+make destroy-clock-server
 make destroy-registry
 make destroy-mqtt
 make destroy-longhorn

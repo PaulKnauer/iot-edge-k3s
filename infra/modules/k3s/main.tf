@@ -125,6 +125,81 @@ resource "null_resource" "agents_join" {
   }
 }
 
+# --- Configure node registry mirrors/insecure registries ---
+resource "null_resource" "configure_registries_servers" {
+  for_each = {
+    for s in var.servers : s.name => s
+  }
+
+  triggers = {
+    host            = each.value.host
+    registries_hash = sha256(var.registries_yaml)
+    script_hash     = filesha256("${path.module}/scripts/configure_registries.sh")
+  }
+
+  connection {
+    type        = "ssh"
+    host        = each.value.host
+    user        = var.ssh_user
+    port        = var.ssh_port
+    private_key = file(var.ssh_private_key_path)
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/scripts/configure_registries.sh"
+    destination = "/tmp/configure_registries.sh"
+  }
+
+  provisioner "file" {
+    content     = var.registries_yaml
+    destination = "/tmp/registries.yaml"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/configure_registries.sh",
+      "sudo /tmp/configure_registries.sh k3s /tmp/registries.yaml",
+    ]
+  }
+}
+
+resource "null_resource" "configure_registries_agents" {
+  for_each = {
+    for a in var.agents : a.name => a
+  }
+
+  triggers = {
+    host            = each.value.host
+    registries_hash = sha256(var.registries_yaml)
+    script_hash     = filesha256("${path.module}/scripts/configure_registries.sh")
+  }
+
+  connection {
+    type        = "ssh"
+    host        = each.value.host
+    user        = var.ssh_user
+    port        = var.ssh_port
+    private_key = file(var.ssh_private_key_path)
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/scripts/configure_registries.sh"
+    destination = "/tmp/configure_registries.sh"
+  }
+
+  provisioner "file" {
+    content     = var.registries_yaml
+    destination = "/tmp/registries.yaml"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/configure_registries.sh",
+      "sudo /tmp/configure_registries.sh k3s-agent /tmp/registries.yaml",
+    ]
+  }
+}
+
 # --- Fetch kubeconfig to your laptop and rewrite endpoint ---
 resource "null_resource" "fetch_kubeconfig" {
   triggers = {
@@ -133,7 +208,11 @@ resource "null_resource" "fetch_kubeconfig" {
     kubeconfig_path  = var.kubeconfig_path
   }
 
-  depends_on = [null_resource.server_init]
+  depends_on = [
+    null_resource.server_init,
+    null_resource.configure_registries_servers,
+    null_resource.configure_registries_agents,
+  ]
 
   provisioner "local-exec" {
     command     = <<EOT

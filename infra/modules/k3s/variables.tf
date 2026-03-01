@@ -35,3 +35,8 @@ variable "disable_traefik" {
   type    = bool
   default = true
 }
+
+variable "registries_yaml" {
+  type    = string
+  default = ""
+}
