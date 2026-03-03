@@ -25,3 +25,4 @@ env:
   protocol: http
   encryptionKeySecretName: n8n-encryption-key
   encryptionKeySecretKey: encryptionKey
+  secureCookie: false

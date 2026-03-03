@@ -44,6 +44,8 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.env.encryptionKeySecretName }}
                   key: {{ .Values.env.encryptionKeySecretKey }}
+            - name: N8N_SECURE_COOKIE
+              value: {{ .Values.env.secureCookie | quote }}
           ports:
             - containerPort: {{ .Values.service.port }}
               name: http

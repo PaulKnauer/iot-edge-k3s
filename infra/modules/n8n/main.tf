@@ -22,12 +22,19 @@ provider "kubernetes" {
   config_path = var.kubeconfig_path
 }
 
+resource "kubernetes_namespace_v1" "n8n" {
+  metadata {
+    name = var.namespace
+  }
+}
+
 resource "helm_release" "n8n" {
-  name             = "n8n"
-  namespace        = var.namespace
-  create_namespace = true
+  name      = "n8n"
+  namespace = kubernetes_namespace_v1.n8n.metadata[0].name
 
   chart = "${path.module}/charts/n8n"
+
+  depends_on = [kubernetes_secret_v1.encryption_key]
 
   values = [
     yamlencode({
@@ -54,6 +61,7 @@ resource "helm_release" "n8n" {
         protocol               = var.protocol
         encryptionKeySecretName = var.encryption_key_secret_name
         encryptionKeySecretKey  = var.encryption_key_secret_key
+        secureCookie            = var.secure_cookie
       }
     })
   ]

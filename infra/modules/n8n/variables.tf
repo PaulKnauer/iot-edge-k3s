@@ -91,3 +91,8 @@ variable "encryption_key_secret_key" {
   type    = string
   default = "encryptionKey"
 }
+
+variable "secure_cookie" {
+  type    = bool
+  default = false
+}
