@@ -1,0 +1,27 @@
+replicaCount: 1
+
+image:
+  repository: n8nio/n8n
+  tag: "1.83.2"
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 5678
+  nodePort: 31678
+
+persistence:
+  enabled: true
+  storageClass: longhorn
+  size: 2Gi
+  accessMode: ReadWriteOnce
+
+resources: {}
+
+deploymentStrategy: Recreate
+
+env:
+  timezone: UTC
+  protocol: http
+  encryptionKeySecretName: n8n-encryption-key
+  encryptionKeySecretKey: encryptionKey

@@ -1,7 +1,7 @@
 TERRAGRUNT=terragrunt
 ROOT=infra
 
-.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn plan-nodered apply-nodered plan-registry apply-registry plan-clock-server apply-clock-server plan-cert-manager apply-cert-manager plan-ingress apply-ingress plan-qdrant apply-qdrant destroy-k3s destroy-mqtt destroy-longhorn destroy-nodered destroy-registry destroy-clock-server destroy-ingress destroy-cert-manager destroy-qdrant
+.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn plan-nodered apply-nodered plan-registry apply-registry plan-clock-server apply-clock-server plan-cert-manager apply-cert-manager plan-ingress apply-ingress plan-qdrant apply-qdrant plan-n8n apply-n8n destroy-k3s destroy-mqtt destroy-longhorn destroy-nodered destroy-registry destroy-clock-server destroy-ingress destroy-cert-manager destroy-qdrant destroy-n8n
 
 fmt:
 	cd $(ROOT) && $(TERRAGRUNT) hcl format
@@ -87,3 +87,12 @@ apply-qdrant:
 
 destroy-qdrant:
 	cd $(ROOT)/live/home/qdrant && $(TERRAGRUNT) destroy
+
+plan-n8n:
+	cd $(ROOT)/live/home/n8n && $(TERRAGRUNT) plan
+
+apply-n8n:
+	cd $(ROOT)/live/home/n8n && $(TERRAGRUNT) apply
+
+destroy-n8n:
+	cd $(ROOT)/live/home/n8n && $(TERRAGRUNT) destroy
