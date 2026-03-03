@@ -10,6 +10,14 @@ terraform {
   extra_arguments "common_vars" {
     commands = ["plan", "apply", "destroy"]
   }
+
+  extra_arguments "plugin_cache" {
+    commands = ["init", "plan", "apply", "destroy"]
+    env_vars = {
+      TF_PLUGIN_CACHE_DIR = pathexpand("~/.terraform.d/plugin-cache")
+      GODEBUG             = "preferIPv4=1"
+    }
+  }
 }
 
 inputs = {
