@@ -7,7 +7,7 @@ dependency "k3s" {
 }
 
 dependencies {
-  paths = ["../cert-manager", "../clock-server", "../nodered", "../registry"]
+  paths = ["../cert-manager", "../clock-server", "../nodered", "../registry", "../authelia"]
 }
 
 terraform {
