@@ -32,7 +32,8 @@ resource "helm_release" "n8n" {
   name      = "n8n"
   namespace = kubernetes_namespace_v1.n8n.metadata[0].name
 
-  chart = "${path.module}/charts/n8n"
+  chart   = "${path.module}/charts/n8n"
+  timeout = 600
 
   depends_on = [kubernetes_secret_v1.encryption_key]
 
