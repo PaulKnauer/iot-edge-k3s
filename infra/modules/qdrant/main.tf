@@ -39,7 +39,7 @@ resource "helm_release" "qdrant" {
         size         = var.storage_size
         accessMode   = var.storage_access_mode
       }
-      resources         = var.resources
+      resources          = var.resources
       deploymentStrategy = var.deployment_strategy
     })
   ]

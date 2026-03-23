@@ -35,9 +35,9 @@ resource "kubernetes_secret_v1" "authelia_secrets" {
   }
 
   data = {
-    JWT_TOKEN               = var.jwt_secret
-    SESSION_ENCRYPTION_KEY  = var.session_secret
-    STORAGE_ENCRYPTION_KEY  = var.storage_encryption_key
+    JWT_TOKEN              = var.jwt_secret
+    SESSION_ENCRYPTION_KEY = var.session_secret
+    STORAGE_ENCRYPTION_KEY = var.storage_encryption_key
   }
 }
 

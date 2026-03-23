@@ -55,11 +55,11 @@ resource "helm_release" "n8n" {
         size         = var.storage_size
         accessMode   = var.storage_access_mode
       }
-      resources         = var.resources
+      resources          = var.resources
       deploymentStrategy = var.deployment_strategy
       env = {
-        timezone               = var.timezone
-        protocol               = var.protocol
+        timezone                = var.timezone
+        protocol                = var.protocol
         encryptionKeySecretName = var.encryption_key_secret_name
         encryptionKeySecretKey  = var.encryption_key_secret_key
         secureCookie            = var.secure_cookie
