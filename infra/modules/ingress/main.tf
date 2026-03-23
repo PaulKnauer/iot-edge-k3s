@@ -49,8 +49,9 @@ resource "helm_release" "ingress_nginx" {
 
 resource "null_resource" "cert_and_ingress" {
   triggers = {
-    node_ip = var.node_ip
-    domain  = var.domain
+    node_ip            = var.node_ip
+    domain             = var.domain
+    authelia_namespace = var.authelia_namespace
   }
 
   provisioner "local-exec" {
@@ -78,6 +79,7 @@ spec:
     - clock.${var.domain}
     - nodered.${var.domain}
     - registry.${var.domain}
+    - authelia.${var.domain}
   ipAddresses:
     - ${var.node_ip}
 EOF
@@ -95,6 +97,9 @@ metadata:
   namespace: ${var.clock_server_namespace}
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local/api/authz/forward-auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://authelia.${var.domain}:${var.https_node_port}/?rd=https://$http_host:${var.https_node_port}$request_uri"
+    nginx.ingress.kubernetes.io/auth-response-headers: "Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 spec:
   ingressClassName: nginx
   rules:
@@ -121,6 +126,9 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local/api/authz/forward-auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://authelia.${var.domain}:${var.https_node_port}/?rd=https://$http_host:${var.https_node_port}$request_uri"
+    nginx.ingress.kubernetes.io/auth-response-headers: "Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 spec:
   ingressClassName: nginx
   rules:
@@ -163,14 +171,39 @@ spec:
                   number: ${var.registry_port}
 EOF
 
+      echo "Applying Authelia Ingress..."
+      kubectl apply -f - <<EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authelia
+  namespace: ${var.authelia_namespace}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: authelia.${var.domain}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${var.authelia_service}
+                port:
+                  number: 9091
+EOF
+
       echo "HTTPS ingress setup complete."
       echo ""
       echo "Add to /etc/hosts on each client machine:"
-      echo "  ${var.node_ip}  clock.${var.domain} nodered.${var.domain} registry.${var.domain}"
+      echo "  ${var.node_ip}  clock.${var.domain} nodered.${var.domain} registry.${var.domain} authelia.${var.domain}"
       echo ""
       echo "Access via:"
-      echo "  https://clock.${var.domain}:${var.https_node_port}"
-      echo "  https://nodered.${var.domain}:${var.https_node_port}"
+      echo "  https://authelia.${var.domain}:${var.https_node_port}  (login portal)"
+      echo "  https://clock.${var.domain}:${var.https_node_port}     (protected by Authelia)"
+      echo "  https://nodered.${var.domain}:${var.https_node_port}   (protected by Authelia)"
       echo "  https://registry.${var.domain}:${var.https_node_port}"
       echo ""
       echo "Export CA cert to trust it:"

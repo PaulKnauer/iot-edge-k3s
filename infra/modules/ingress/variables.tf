@@ -81,3 +81,13 @@ variable "registry_port" {
   type    = number
   default = 5000
 }
+
+variable "authelia_namespace" {
+  type    = string
+  default = "authelia"
+}
+
+variable "authelia_service" {
+  type    = string
+  default = "authelia"
+}

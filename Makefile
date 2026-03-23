@@ -1,7 +1,7 @@
 TERRAGRUNT=terragrunt
 ROOT=infra
 
-.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn plan-nodered apply-nodered plan-registry apply-registry plan-clock-server apply-clock-server plan-cert-manager apply-cert-manager plan-ingress apply-ingress plan-qdrant apply-qdrant plan-n8n apply-n8n destroy-k3s destroy-mqtt destroy-longhorn destroy-nodered destroy-registry destroy-clock-server destroy-ingress destroy-cert-manager destroy-qdrant destroy-n8n
+.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn plan-nodered apply-nodered plan-registry apply-registry plan-clock-server apply-clock-server plan-cert-manager apply-cert-manager plan-ingress apply-ingress plan-qdrant apply-qdrant plan-n8n apply-n8n plan-authelia apply-authelia destroy-k3s destroy-mqtt destroy-longhorn destroy-nodered destroy-registry destroy-clock-server destroy-ingress destroy-cert-manager destroy-qdrant destroy-n8n destroy-authelia
 
 fmt:
 	cd $(ROOT) && $(TERRAGRUNT) hcl format
@@ -96,3 +96,12 @@ apply-n8n:
 
 destroy-n8n:
 	cd $(ROOT)/live/home/n8n && $(TERRAGRUNT) destroy
+
+plan-authelia:
+	cd $(ROOT)/live/home/authelia && $(TERRAGRUNT) plan
+
+apply-authelia:
+	cd $(ROOT)/live/home/authelia && $(TERRAGRUNT) apply
+
+destroy-authelia:
+	cd $(ROOT)/live/home/authelia && $(TERRAGRUNT) destroy
