@@ -26,3 +26,4 @@ env:
   encryptionKeySecretName: n8n-encryption-key
   encryptionKeySecretKey: encryptionKey
   secureCookie: false
+  qdrantUrl: "http://qdrant.qdrant.svc.cluster.local:6333"

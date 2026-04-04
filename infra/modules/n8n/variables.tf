@@ -96,3 +96,8 @@ variable "secure_cookie" {
   type    = bool
   default = false
 }
+
+variable "qdrant_url" {
+  type    = string
+  default = "http://qdrant.qdrant.svc.cluster.local:6333"
+}

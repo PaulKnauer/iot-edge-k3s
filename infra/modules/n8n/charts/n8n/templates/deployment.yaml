@@ -46,6 +46,8 @@ spec:
                   key: {{ .Values.env.encryptionKeySecretKey }}
             - name: N8N_SECURE_COOKIE
               value: {{ .Values.env.secureCookie | quote }}
+            - name: QDRANT_URL
+              value: {{ .Values.env.qdrantUrl | quote }}
           ports:
             - containerPort: {{ .Values.service.port }}
               name: http
