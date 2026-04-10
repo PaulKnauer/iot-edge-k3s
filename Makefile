@@ -1,7 +1,7 @@
 TERRAGRUNT=terragrunt
 ROOT=infra
 
-.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn plan-nodered apply-nodered plan-registry apply-registry plan-clock-server apply-clock-server plan-cert-manager apply-cert-manager plan-ingress apply-ingress plan-qdrant apply-qdrant plan-n8n apply-n8n plan-authelia apply-authelia destroy-k3s destroy-mqtt destroy-longhorn destroy-nodered destroy-registry destroy-clock-server destroy-ingress destroy-cert-manager destroy-qdrant destroy-n8n destroy-authelia
+.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn plan-nodered apply-nodered plan-registry apply-registry plan-clock-server apply-clock-server plan-cert-manager apply-cert-manager plan-ingress apply-ingress plan-qdrant apply-qdrant plan-n8n apply-n8n plan-authelia apply-authelia plan-sonos-mcp apply-sonos-mcp destroy-k3s destroy-mqtt destroy-longhorn destroy-nodered destroy-registry destroy-clock-server destroy-ingress destroy-cert-manager destroy-qdrant destroy-n8n destroy-authelia destroy-sonos-mcp
 
 fmt:
 	cd $(ROOT) && $(TERRAGRUNT) hcl format
@@ -105,3 +105,12 @@ apply-authelia:
 
 destroy-authelia:
 	cd $(ROOT)/live/home/authelia && $(TERRAGRUNT) destroy
+
+plan-sonos-mcp:
+	cd $(ROOT)/live/home/sonos-mcp && $(TERRAGRUNT) plan
+
+apply-sonos-mcp:
+	cd $(ROOT)/live/home/sonos-mcp && $(TERRAGRUNT) apply
+
+destroy-sonos-mcp:
+	cd $(ROOT)/live/home/sonos-mcp && $(TERRAGRUNT) destroy
