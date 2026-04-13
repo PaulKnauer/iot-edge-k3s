@@ -17,9 +17,15 @@ inputs = {
   node_port = 31800
 
   # Image built and pushed to local registry
-  image_repository = "192.168.2.201:32000/soniq-mcp"
-  image_tag        = "latest"
+  image_repository  = "192.168.2.201:32000/soniq-mcp"
+  image_tag         = "v0.4.0"
   image_pull_policy = "Always"
+
+  # Registry auth
+  image_pull_secret_name = get_env("REGISTRY_PULL_SECRET_NAME", "regcred")
+  registry_server        = "192.168.2.201:32000"
+  registry_username      = get_env("REGISTRY_USERNAME", "")
+  registry_password      = get_env("REGISTRY_PASSWORD", "")
 
   # Optional: set a default Sonos room (set via env to avoid hardcoding)
   default_room = get_env("SONOS_MCP_DEFAULT_ROOM", "")

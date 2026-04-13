@@ -47,3 +47,24 @@ variable "default_room" {
   sensitive = true
   default   = ""
 }
+
+variable "image_pull_secret_name" {
+  type    = string
+  default = ""
+}
+
+variable "registry_server" {
+  type    = string
+  default = ""
+}
+
+variable "registry_username" {
+  type    = string
+  default = ""
+}
+
+variable "registry_password" {
+  type      = string
+  sensitive = true
+  default   = ""
+}

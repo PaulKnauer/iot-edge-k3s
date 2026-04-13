@@ -2,6 +2,7 @@ image:
   repository: soniq-mcp
   tag: local
   pullPolicy: IfNotPresent
+  imagePullSecretName: ""
 
 service:
   type: NodePort

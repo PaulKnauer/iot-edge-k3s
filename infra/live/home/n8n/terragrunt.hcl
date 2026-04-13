@@ -22,4 +22,5 @@ inputs = {
 
   # n8n settings (set via env to avoid hardcoding secrets)
   encryption_key = get_env("N8N_ENCRYPTION_KEY", "")
+  webhook_url    = "http://192.168.2.201:31678"
 }

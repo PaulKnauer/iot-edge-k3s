@@ -96,3 +96,8 @@ variable "secure_cookie" {
   type    = bool
   default = false
 }
+
+variable "webhook_url" {
+  type    = string
+  default = ""
+}

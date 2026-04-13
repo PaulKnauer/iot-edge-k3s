@@ -28,6 +28,34 @@ resource "kubernetes_namespace_v1" "sonos_mcp" {
   }
 }
 
+resource "kubernetes_secret_v1" "registry_pull_secret" {
+  count = (
+    var.image_pull_secret_name != "" &&
+    var.registry_server != "" &&
+    var.registry_username != "" &&
+    var.registry_password != ""
+  ) ? 1 : 0
+
+  metadata {
+    name      = var.image_pull_secret_name
+    namespace = kubernetes_namespace_v1.sonos_mcp.metadata[0].name
+  }
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        (var.registry_server) = {
+          username = var.registry_username
+          password = var.registry_password
+          auth     = base64encode("${var.registry_username}:${var.registry_password}")
+        }
+      }
+    })
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+}
+
 resource "helm_release" "sonos_mcp" {
   name      = "sonos-mcp"
   namespace = kubernetes_namespace_v1.sonos_mcp.metadata[0].name
@@ -38,9 +66,10 @@ resource "helm_release" "sonos_mcp" {
   values = [
     yamlencode({
       image = {
-        repository = var.image_repository
-        tag        = var.image_tag
-        pullPolicy = var.image_pull_policy
+        repository          = var.image_repository
+        tag                 = var.image_tag
+        pullPolicy          = var.image_pull_policy
+        imagePullSecretName = var.image_pull_secret_name
       }
       service = {
         type     = "NodePort"
@@ -61,5 +90,9 @@ resource "helm_release" "sonos_mcp" {
         defaultRoom = var.default_room
       }
     })
+  ]
+
+  depends_on = [
+    kubernetes_secret_v1.registry_pull_secret,
   ]
 }

@@ -63,6 +63,7 @@ resource "helm_release" "n8n" {
         encryptionKeySecretName = var.encryption_key_secret_name
         encryptionKeySecretKey  = var.encryption_key_secret_key
         secureCookie            = var.secure_cookie
+        webhookUrl              = var.webhook_url
       }
     })
   ]
