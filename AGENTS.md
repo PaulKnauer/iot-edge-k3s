@@ -83,3 +83,22 @@ Before any merge:
 ```bash
 terragrunt hclfmt
 terraform fmt -recursive
+```
+
+---
+
+## 5. Node Onboarding Rules
+
+Cluster membership must be managed as Infrastructure-as-Code.
+
+When adding, removing, or changing Raspberry Pi k3s nodes:
+- Update node inventory only in `infra/live/home/k3s/terragrunt.hcl`
+- Run k3s provisioning through Terragrunt (`make apply-k3s` or the equivalent
+  Terragrunt apply for `infra/live/home/k3s`)
+- Do not manually install, join, reset, or configure k3s on nodes over SSH
+- SSH may be used for read-only verification such as hostname, IP address,
+  service status, or OS inspection
+
+Longhorn and other cluster workloads should be expanded through their Terraform
+or Helm modules. Do not apply ad hoc Kubernetes manifests or manual node-local
+storage changes unless they are first represented in this repository.
