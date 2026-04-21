@@ -31,9 +31,11 @@ inputs = {
     { name = "rpi4-3", host = "192.168.2.203" },
   ]
 
-  # 1 worker
+  # 3 workers
   agents = [
     { name = "rpi4-4", host = "192.168.2.204" },
+    { name = "rpi4-5", host = "192.168.2.205" },
+    { name = "rpi4-6", host = "192.168.2.206" },
   ]
 
   # Optional: disable bundled addons you don't need

@@ -3,8 +3,8 @@
 ## Prereqs
 - Terragrunt + Terraform installed
 - SSH key created: ~/.ssh/k3s-edge-iot
-- 4x Pis reachable via SSH (user: ubuntu)
-- Hostnames: rpi4-1.local ... rpi4-4.local
+- 6x Pis reachable via SSH (user: ubuntu)
+- Hostnames: rpi4-1.local ... rpi4-6.local
 
 ## Apply
 make apply-k3s
@@ -13,7 +13,18 @@ make apply-registry
 make apply-mqtt
 make apply-clock-server
 make apply-cert-manager
+make apply-authelia
 make apply-ingress
+
+For Authelia, export secrets before `make apply-authelia`:
+```
+export TF_VAR_authelia_jwt_secret="$(openssl rand -base64 48)"
+export TF_VAR_authelia_session_secret="$(openssl rand -base64 48)"
+export TF_VAR_authelia_storage_key="$(openssl rand -base64 48)"
+read -rsp "Authelia admin password: " AUTHELIA_ADMIN_PASSWORD; echo
+export TF_VAR_authelia_admin_hash="$(docker run --rm authelia/authelia:4.38.9 authelia crypto hash generate argon2 --password "$AUTHELIA_ADMIN_PASSWORD" | awk '/Digest:/ {print $2}')"
+unset AUTHELIA_ADMIN_PASSWORD
+```
 
 ## Verify
 - kubeconfig written to: infra/.kube/home-k3s.yaml
@@ -24,16 +35,19 @@ make apply-ingress
   - broker: <any-node-ip>:31883
 - Clock server NodePort default: 31881
   - app: <any-node-ip>:31881
+- Authelia NodePort default: 31917
+  - portal: <any-node-ip>:31917
 
 ## HTTPS Ingress (cert-manager + nginx-ingress)
 Add to `/etc/hosts` on each client:
 ```
-192.168.2.201  clock.home.lab nodered.home.lab registry.home.lab
+192.168.2.201  clock.home.lab nodered.home.lab registry.home.lab authelia.home.lab
 ```
 Access services at HTTPS NodePort 30443:
 - https://clock.home.lab:30443
 - https://nodered.home.lab:30443
 - https://registry.home.lab:30443 (Docker registry via HTTPS)
+- https://authelia.home.lab:30443
 
 Export the self-signed CA cert to trust it (removes browser warnings):
 ```
@@ -59,6 +73,7 @@ docker login registry.home.lab:30443
 
 ## Destroy
 make destroy-ingress
+make destroy-authelia
 make destroy-cert-manager
 make destroy-clock-server
 make destroy-registry
