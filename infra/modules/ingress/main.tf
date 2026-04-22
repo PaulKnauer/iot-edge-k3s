@@ -97,7 +97,7 @@ metadata:
   namespace: ${var.clock_server_namespace}
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local/api/authz/forward-auth"
+    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local/api/authz/auth-request"
     nginx.ingress.kubernetes.io/auth-signin: "https://authelia.${var.domain}:${var.https_node_port}/?rd=https://$http_host:${var.https_node_port}$request_uri"
     nginx.ingress.kubernetes.io/auth-response-headers: "Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 spec:
@@ -126,7 +126,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local/api/authz/forward-auth"
+    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local/api/authz/auth-request"
     nginx.ingress.kubernetes.io/auth-signin: "https://authelia.${var.domain}:${var.https_node_port}/?rd=https://$http_host:${var.https_node_port}$request_uri"
     nginx.ingress.kubernetes.io/auth-response-headers: "Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 spec:

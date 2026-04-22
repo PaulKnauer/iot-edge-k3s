@@ -34,10 +34,15 @@ resource "kubernetes_secret_v1" "authelia_secrets" {
     namespace = kubernetes_namespace_v1.authelia.metadata[0].name
   }
 
+  type = "Opaque"
+
   data = {
-    JWT_TOKEN              = var.jwt_secret
-    SESSION_ENCRYPTION_KEY = var.session_secret
-    STORAGE_ENCRYPTION_KEY = var.storage_encryption_key
+    "identity_validation.reset_password.jwt.hmac.key" = var.jwt_secret
+    "session.encryption.key"                          = var.session_secret
+    "storage.encryption.key"                          = var.storage_encryption_key
+    "identity_providers.oidc.hmac.key"                = var.oidc_hmac_secret
+    "oidc.jwk.RS256.pem"                              = var.oidc_jwks_private_key
+    "oidc.client.${var.oidc_client_id}.secret"        = var.oidc_client_secret_hash
   }
 }
 
@@ -67,6 +72,7 @@ resource "helm_release" "authelia" {
   repository = "https://charts.authelia.com"
   chart      = "authelia"
   version    = var.chart_version
+  timeout    = var.helm_timeout_seconds
 
   depends_on = [
     kubernetes_secret_v1.authelia_secrets,
@@ -84,6 +90,9 @@ resource "helm_release" "authelia" {
       pod = {
         kind     = "Deployment"
         replicas = 1
+        strategy = {
+          type = "Recreate"
+        }
         extraVolumes = [
           {
             name = "users-database"
@@ -119,7 +128,13 @@ resource "helm_release" "authelia" {
         enabled = true
 
         session = {
-          domain = var.domain
+          cookies = [
+            {
+              domain                  = var.domain
+              subdomain               = var.authelia_subdomain
+              default_redirection_url = var.default_redirection_url
+            }
+          ]
           redis = {
             enabled = false
           }
@@ -171,18 +186,55 @@ resource "helm_release" "authelia" {
         webauthn = {
           disable = false
         }
+
+        identity_providers = {
+          oidc = {
+            enabled = var.oidc_enabled
+            hmac_secret = {
+              path = "identity_providers.oidc.hmac.key"
+            }
+            jwks = [
+              {
+                key_id    = "main"
+                algorithm = "RS256"
+                use       = "sig"
+                key = {
+                  path = "/secrets/${kubernetes_secret_v1.authelia_secrets.metadata[0].name}/oidc.jwk.RS256.pem"
+                }
+              }
+            ]
+            clients = [
+              {
+                client_id   = var.oidc_client_id
+                client_name = var.oidc_client_name
+                client_secret = {
+                  path = "/secrets/${kubernetes_secret_v1.authelia_secrets.metadata[0].name}/oidc.client.${var.oidc_client_id}.secret"
+                }
+                grant_types = var.oidc_client_grant_types
+                scopes      = var.oidc_client_scopes
+
+                authorization_policy = var.oidc_client_authorization_policy
+              }
+            ]
+          }
+        }
       }
 
       secret = {
         existingSecret = kubernetes_secret_v1.authelia_secrets.metadata[0].name
-        jwt = {
-          key = "JWT_TOKEN"
-        }
-        session = {
-          key = "SESSION_ENCRYPTION_KEY"
-        }
-        storageEncryptionKey = {
-          key = "STORAGE_ENCRYPTION_KEY"
+        additionalSecrets = {
+          (kubernetes_secret_v1.authelia_secrets.metadata[0].name) = {
+            items = [
+              {
+                key  = "oidc.jwk.RS256.pem"
+                path = "oidc.jwk.RS256.pem"
+              },
+              {
+                key  = "oidc.client.${var.oidc_client_id}.secret"
+                path = "oidc.client.${var.oidc_client_id}.secret"
+              }
+            ]
+          }
         }
       }
     })

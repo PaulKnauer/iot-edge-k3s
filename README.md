@@ -24,6 +24,11 @@ export TF_VAR_authelia_storage_key="$(openssl rand -base64 48)"
 read -rsp "Authelia admin password: " AUTHELIA_ADMIN_PASSWORD; echo
 export TF_VAR_authelia_admin_hash="$(docker run --rm authelia/authelia:4.38.9 authelia crypto hash generate argon2 --password "$AUTHELIA_ADMIN_PASSWORD" | awk '/Digest:/ {print $2}')"
 unset AUTHELIA_ADMIN_PASSWORD
+export TF_VAR_authelia_oidc_hmac_secret="$(openssl rand -base64 48)"
+export TF_VAR_authelia_oidc_jwks_private_key="$(openssl genrsa 4096)"
+read -rsp "Authelia OIDC test-client secret: " AUTHELIA_OIDC_CLIENT_SECRET; echo
+export TF_VAR_authelia_oidc_client_secret_hash="$(docker run --rm authelia/authelia:4.38.9 authelia crypto hash generate pbkdf2 --variant sha512 --password "$AUTHELIA_OIDC_CLIENT_SECRET" | awk '/Digest:/ {print $2}')"
+unset AUTHELIA_OIDC_CLIENT_SECRET
 ```
 
 ## Verify
