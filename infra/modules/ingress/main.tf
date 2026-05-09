@@ -49,9 +49,10 @@ resource "helm_release" "ingress_nginx" {
 
 resource "null_resource" "cert_and_ingress" {
   triggers = {
-    node_ip            = var.node_ip
-    domain             = var.domain
-    authelia_namespace = var.authelia_namespace
+    node_ip             = var.node_ip
+    domain              = var.domain
+    authelia_namespace  = var.authelia_namespace
+    sonos_mcp_namespace = var.sonos_mcp_namespace
   }
 
   provisioner "local-exec" {
@@ -80,6 +81,7 @@ spec:
     - nodered.${var.domain}
     - registry.${var.domain}
     - authelia.${var.domain}
+    - sonos-mcp.${var.domain}
   ipAddresses:
     - ${var.node_ip}
 EOF
@@ -195,16 +197,43 @@ spec:
                   number: 9091
 EOF
 
+      echo "Applying sonos-mcp Ingress..."
+      kubectl apply -f - <<EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sonos-mcp
+  namespace: ${var.sonos_mcp_namespace}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: sonos-mcp.${var.domain}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${var.sonos_mcp_service}
+                port:
+                  number: ${var.sonos_mcp_port}
+EOF
+
       echo "HTTPS ingress setup complete."
       echo ""
       echo "Add to /etc/hosts on each client machine:"
-      echo "  ${var.node_ip}  clock.${var.domain} nodered.${var.domain} registry.${var.domain} authelia.${var.domain}"
+      echo "  ${var.node_ip}  clock.${var.domain} nodered.${var.domain} registry.${var.domain} authelia.${var.domain} sonos-mcp.${var.domain}"
       echo ""
       echo "Access via:"
       echo "  https://authelia.${var.domain}:${var.https_node_port}  (login portal)"
       echo "  https://clock.${var.domain}:${var.https_node_port}     (protected by Authelia)"
       echo "  https://nodered.${var.domain}:${var.https_node_port}   (protected by Authelia)"
       echo "  https://registry.${var.domain}:${var.https_node_port}"
+      echo "  https://sonos-mcp.${var.domain}:${var.https_node_port} (MCP SSE endpoint)"
       echo ""
       echo "Export CA cert to trust it:"
       echo "  kubectl get secret homelab-ca-tls -n cert-manager -o jsonpath='{.data.tls\\.crt}' | base64 -d > homelab-ca.crt"

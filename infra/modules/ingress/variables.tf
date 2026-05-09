@@ -91,3 +91,18 @@ variable "authelia_service" {
   type    = string
   default = "authelia"
 }
+
+variable "sonos_mcp_namespace" {
+  type    = string
+  default = "sonos-mcp"
+}
+
+variable "sonos_mcp_service" {
+  type    = string
+  default = "sonos-mcp-soniq"
+}
+
+variable "sonos_mcp_port" {
+  type    = number
+  default = 8000
+}
