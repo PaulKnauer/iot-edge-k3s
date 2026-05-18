@@ -50,9 +50,13 @@ resource "helm_release" "ingress_nginx" {
 resource "null_resource" "cert_and_ingress" {
   triggers = {
     node_ip             = var.node_ip
+    node_dns_names      = join(",", var.node_dns_names)
     domain              = var.domain
+    https_node_port     = var.https_node_port
+    ingress_tls_secret  = "homelab-tls"
     authelia_namespace  = var.authelia_namespace
     sonos_mcp_namespace = var.sonos_mcp_namespace
+    sonos_mcp_hosts     = join(",", concat(["sonos-mcp.${var.domain}"], var.sonos_mcp_extra_hosts))
   }
 
   provisioner "local-exec" {
@@ -82,6 +86,9 @@ spec:
     - registry.${var.domain}
     - authelia.${var.domain}
     - sonos-mcp.${var.domain}
+%{for name in var.node_dns_names~}
+    - ${name}
+%{endfor~}
   ipAddresses:
     - ${var.node_ip}
 EOF
@@ -104,6 +111,10 @@ metadata:
     nginx.ingress.kubernetes.io/auth-response-headers: "Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - clock.${var.domain}
+      secretName: homelab-tls
   rules:
     - host: clock.${var.domain}
       http:
@@ -133,6 +144,10 @@ metadata:
     nginx.ingress.kubernetes.io/auth-response-headers: "Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - nodered.${var.domain}
+      secretName: homelab-tls
   rules:
     - host: nodered.${var.domain}
       http:
@@ -160,6 +175,10 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - registry.${var.domain}
+      secretName: homelab-tls
   rules:
     - host: registry.${var.domain}
       http:
@@ -184,6 +203,10 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - authelia.${var.domain}
+      secretName: homelab-tls
   rules:
     - host: authelia.${var.domain}
       http:
@@ -210,8 +233,15 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+%{for host in concat(["sonos-mcp.${var.domain}"], var.sonos_mcp_extra_hosts)~}
+        - ${host}
+%{endfor~}
+      secretName: homelab-tls
   rules:
-    - host: sonos-mcp.${var.domain}
+%{for host in concat(["sonos-mcp.${var.domain}"], var.sonos_mcp_extra_hosts)~}
+    - host: ${host}
       http:
         paths:
           - path: /
@@ -221,6 +251,7 @@ spec:
                 name: ${var.sonos_mcp_service}
                 port:
                   number: ${var.sonos_mcp_port}
+%{endfor~}
 EOF
 
       echo "HTTPS ingress setup complete."
@@ -234,6 +265,9 @@ EOF
       echo "  https://nodered.${var.domain}:${var.https_node_port}   (protected by Authelia)"
       echo "  https://registry.${var.domain}:${var.https_node_port}"
       echo "  https://sonos-mcp.${var.domain}:${var.https_node_port} (MCP SSE endpoint)"
+%{for host in var.sonos_mcp_extra_hosts~}
+      echo "  https://${host}:${var.https_node_port}/mcp (Sonos MCP via extra host)"
+%{endfor~}
       echo ""
       echo "Export CA cert to trust it:"
       echo "  kubectl get secret homelab-ca-tls -n cert-manager -o jsonpath='{.data.tls\\.crt}' | base64 -d > homelab-ca.crt"

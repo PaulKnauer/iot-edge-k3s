@@ -30,6 +30,7 @@ resource "kubernetes_namespace_v1" "sonos_mcp" {
 
 resource "kubernetes_secret_v1" "registry_pull_secret" {
   count = (
+    var.create_image_pull_secret &&
     var.image_pull_secret_name != "" &&
     var.registry_server != "" &&
     var.registry_username != "" &&
@@ -61,7 +62,7 @@ resource "helm_release" "sonos_mcp" {
   namespace = kubernetes_namespace_v1.sonos_mcp.metadata[0].name
 
   chart   = "${path.module}/charts/soniq"
-  timeout = 300
+  timeout = var.helm_timeout_seconds
 
   values = [
     yamlencode({
@@ -77,17 +78,29 @@ resource "helm_release" "sonos_mcp" {
         nodePort = var.node_port
       }
       config = {
-        transport     = "http"
-        httpHost      = "0.0.0.0"
-        httpPort      = "8000"
-        exposure      = "home-network"
-        logLevel      = var.log_level
-        maxVolumePct  = var.max_volume_pct
-        toolsDisabled = var.tools_disabled
-        configFile    = ""
+        transport       = "http"
+        httpHost        = "0.0.0.0"
+        httpPort        = "8000"
+        exposure        = "home-network"
+        logLevel        = var.log_level
+        maxVolumePct    = var.max_volume_pct
+        toolsDisabled   = var.tools_disabled
+        configFile      = ""
+        authMode        = var.auth_mode
+        oidcIssuer      = var.oidc_issuer
+        oidcAudience    = var.oidc_audience
+        oidcJwksUri     = var.oidc_jwks_uri
+        oidcResourceUrl = var.oidc_resource_url
       }
       secret = {
         defaultRoom = var.default_room
+        authToken   = var.auth_token
+      }
+      caBundle = {
+        enabled       = var.ca_bundle_enabled
+        configMapName = var.ca_bundle_config_map_name
+        configMapKey  = var.ca_bundle_config_map_key
+        mountPath     = var.ca_bundle_mount_path
       }
     })
   ]

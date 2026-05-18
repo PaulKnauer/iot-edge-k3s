@@ -27,6 +27,11 @@ variable "node_port" {
   default = 31800
 }
 
+variable "helm_timeout_seconds" {
+  type    = number
+  default = 300
+}
+
 variable "log_level" {
   type    = string
   default = "INFO"
@@ -48,9 +53,70 @@ variable "default_room" {
   default   = ""
 }
 
+variable "auth_mode" {
+  type    = string
+  default = ""
+
+  validation {
+    condition     = contains(["", "none", "static", "oidc"], var.auth_mode)
+    error_message = "auth_mode must be empty, none, static, or oidc."
+  }
+}
+
+variable "auth_token" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "oidc_issuer" {
+  type    = string
+  default = ""
+}
+
+variable "oidc_audience" {
+  type    = string
+  default = ""
+}
+
+variable "oidc_jwks_uri" {
+  type    = string
+  default = ""
+}
+
+variable "oidc_resource_url" {
+  type    = string
+  default = ""
+}
+
+variable "ca_bundle_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "ca_bundle_config_map_name" {
+  type    = string
+  default = ""
+}
+
+variable "ca_bundle_config_map_key" {
+  type    = string
+  default = "ca.crt"
+}
+
+variable "ca_bundle_mount_path" {
+  type    = string
+  default = "/etc/soniq/ca.crt"
+}
+
 variable "image_pull_secret_name" {
   type    = string
   default = ""
+}
+
+variable "create_image_pull_secret" {
+  type    = bool
+  default = false
 }
 
 variable "registry_server" {

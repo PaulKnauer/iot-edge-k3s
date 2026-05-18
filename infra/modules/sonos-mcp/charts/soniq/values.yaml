@@ -28,6 +28,18 @@ config:
   maxVolumePct: "80"
   toolsDisabled: ""
   configFile: ""
+  authMode: ""
+  oidcIssuer: ""
+  oidcAudience: ""
+  oidcJwksUri: ""
+  oidcResourceUrl: ""
 
 secret:
   defaultRoom: ""
+  authToken: ""
+
+caBundle:
+  enabled: false
+  configMapName: ""
+  configMapKey: "ca.crt"
+  mountPath: "/etc/soniq/ca.crt"

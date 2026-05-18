@@ -20,6 +20,9 @@ inputs = {
   node_ip = "192.168.2.201"
   domain  = "home.lab"
 
+  node_dns_names        = ["rpi4-1.local"]
+  sonos_mcp_extra_hosts = ["rpi4-1.local"]
+
   https_node_port = 30443
   http_node_port  = 30080
 }

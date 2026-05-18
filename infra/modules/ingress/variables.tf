@@ -17,6 +17,11 @@ variable "domain" {
   default = "home.lab"
 }
 
+variable "node_dns_names" {
+  type    = list(string)
+  default = []
+}
+
 variable "http_node_port" {
   type    = number
   default = 30080
@@ -105,4 +110,9 @@ variable "sonos_mcp_service" {
 variable "sonos_mcp_port" {
   type    = number
   default = 8000
+}
+
+variable "sonos_mcp_extra_hosts" {
+  type    = list(string)
+  default = []
 }
