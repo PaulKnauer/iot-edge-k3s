@@ -25,4 +25,10 @@ inputs = {
 
   https_node_port = 30443
   http_node_port  = 30080
+
+  # ArgoCD ingress — service name matches Helm release "argocd" + chart "argo-cd"
+  argocd_namespace = "argocd"
+  argocd_service   = "argocd-argo-cd-server"
+  argocd_port      = 80
+  argocd_grpc_port = 443
 }

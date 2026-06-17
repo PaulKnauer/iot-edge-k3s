@@ -116,3 +116,23 @@ variable "sonos_mcp_extra_hosts" {
   type    = list(string)
   default = []
 }
+
+variable "argocd_namespace" {
+  type    = string
+  default = "argocd"
+}
+
+variable "argocd_service" {
+  type    = string
+  default = "argocd-argo-cd-server"
+}
+
+variable "argocd_port" {
+  type    = number
+  default = 80
+}
+
+variable "argocd_grpc_port" {
+  type    = number
+  default = 443
+}

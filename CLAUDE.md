@@ -43,3 +43,4 @@ make plan-sonos-mcp    # plan Sonos MCP server
 | Node-RED | — | `infra/modules/nodered/` |
 | n8n | — | `infra/modules/n8n/` |
 | Qdrant | — | `infra/modules/qdrant/` |
+| ArgoCD | — | `infra/modules/argocd/` |

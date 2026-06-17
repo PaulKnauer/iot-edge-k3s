@@ -86,6 +86,7 @@ spec:
     - registry.${var.domain}
     - authelia.${var.domain}
     - sonos-mcp.${var.domain}
+    - argocd.${var.domain}
 %{for name in var.node_dns_names~}
     - ${name}
 %{endfor~}
@@ -254,17 +255,77 @@ spec:
 %{endfor~}
 EOF
 
+      echo "Applying argocd Ingress..."
+      kubectl apply -f - <<EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-server
+  namespace: ${var.argocd_namespace}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - argocd.${var.domain}
+      secretName: homelab-tls
+  rules:
+    - host: argocd.${var.domain}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${var.argocd_service}
+                port:
+                  number: ${var.argocd_port}
+EOF
+
+      echo "Applying argocd gRPC Ingress (for CLI)..."
+      kubectl apply -f - <<EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-grpc
+  namespace: ${var.argocd_namespace}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPCS"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - grpc.argocd.${var.domain}
+      secretName: homelab-tls
+  rules:
+    - host: grpc.argocd.${var.domain}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ${var.argocd_service}
+                port:
+                  number: ${var.argocd_grpc_port}
+EOF
+
       echo "HTTPS ingress setup complete."
       echo ""
       echo "Add to /etc/hosts on each client machine:"
-      echo "  ${var.node_ip}  clock.${var.domain} nodered.${var.domain} registry.${var.domain} authelia.${var.domain} sonos-mcp.${var.domain}"
+      echo "  ${var.node_ip}  clock.${var.domain} nodered.${var.domain} registry.${var.domain} authelia.${var.domain} sonos-mcp.${var.domain} argocd.${var.domain} grpc.argocd.${var.domain}"
       echo ""
       echo "Access via:"
-      echo "  https://authelia.${var.domain}:${var.https_node_port}  (login portal)"
-      echo "  https://clock.${var.domain}:${var.https_node_port}     (protected by Authelia)"
-      echo "  https://nodered.${var.domain}:${var.https_node_port}   (protected by Authelia)"
+      echo "  https://authelia.${var.domain}:${var.https_node_port}     (login portal)"
+      echo "  https://clock.${var.domain}:${var.https_node_port}        (protected by Authelia)"
+      echo "  https://nodered.${var.domain}:${var.https_node_port}      (protected by Authelia)"
       echo "  https://registry.${var.domain}:${var.https_node_port}"
-      echo "  https://sonos-mcp.${var.domain}:${var.https_node_port} (MCP SSE endpoint)"
+      echo "  https://sonos-mcp.${var.domain}:${var.https_node_port}    (MCP SSE endpoint)"
+      echo "  https://argocd.${var.domain}:${var.https_node_port}       (GitOps UI - login: admin)"
+      echo "  grpc.argocd.${var.domain}:${var.https_node_port}          (ArgoCD CLI endpoint)"
 %{for host in var.sonos_mcp_extra_hosts~}
       echo "  https://${host}:${var.https_node_port}/mcp (Sonos MCP via extra host)"
 %{endfor~}
