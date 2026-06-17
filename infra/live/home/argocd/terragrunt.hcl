@@ -4,6 +4,10 @@ include "root" {
 
 dependency "k3s" {
   config_path = "../k3s"
+
+  mock_outputs = {
+    kubeconfig_path = "${get_repo_root()}/infra/.kube/home-k3s.yaml"
+  }
 }
 
 terraform {

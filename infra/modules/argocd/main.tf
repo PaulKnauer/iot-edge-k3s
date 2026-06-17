@@ -9,7 +9,7 @@ terraform {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     config_path = var.kubeconfig_path
   }
 }
@@ -30,8 +30,10 @@ resource "helm_release" "argocd" {
   timeout = var.helm_timeout_seconds
 
   # Don't delete CRDs on destroy so existing Applications survive
-  set {
-    name  = "crds.keep"
-    value = "true"
-  }
+  set = [
+    {
+      name  = "crds.keep"
+      value = "true"
+    }
+  ]
 }
