@@ -1,12 +1,6 @@
-output "admin_password" {
-  description = "Base64-encoded initial admin password"
-  value       = data.kubernetes_secret.argocd_admin.data["password"]
-  sensitive   = true
-}
-
 output "server_service" {
-  description = "ArgoCD server service name"
-  value       = "argocd-server"
+  description = "ArgoCD server service name (Helm fullname: <release>-argo-cd-server)"
+  value       = "argocd-argo-cd-server"
 }
 
 output "namespace" {

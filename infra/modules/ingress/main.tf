@@ -87,6 +87,7 @@ spec:
     - authelia.${var.domain}
     - sonos-mcp.${var.domain}
     - argocd.${var.domain}
+    - grpc.argocd.${var.domain}
 %{for name in var.node_dns_names~}
     - ${name}
 %{endfor~}
