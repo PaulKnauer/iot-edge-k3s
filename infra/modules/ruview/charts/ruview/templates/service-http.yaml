@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ruview.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "ruview.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  type: {{ .Values.service.http.type }}
+  ports:
+    - port: {{ .Values.service.http.port }}
+      targetPort: {{ .Values.service.http.port }}
+      protocol: TCP
+      name: http
+      {{- if .Values.service.http.nodePort }}
+      nodePort: {{ .Values.service.http.nodePort }}
+      {{- end }}
+  selector:
+    app.kubernetes.io/name: {{ include "ruview.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

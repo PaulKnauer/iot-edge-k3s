@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ruview
+description: RuView WiFi sensing server (ESP32 CSI → presence/vitals → MQTT HA auto-discovery)
+type: application
+version: 0.1.0
+appVersion: "latest"

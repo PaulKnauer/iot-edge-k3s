@@ -1,0 +1,38 @@
+replicaCount: 1
+
+image:
+  repository: ruview-sensing-server
+  tag: "latest"
+  pullPolicy: IfNotPresent
+  imagePullSecretName: ""
+
+sensing:
+  source: "auto"
+  # allowUnauthenticated: required when RUVIEW_API_TOKEN is unset and
+  # bindAddr is 0.0.0.0 (the entrypoint security check; see issue #864).
+  allowUnauthenticated: "1"
+  # allowedHosts: comma-separated Host headers to accept (DNS-rebinding defense).
+  # e.g. "192.168.2.201:31801,ruview.local:31801"
+  allowedHosts: ""
+
+mqtt:
+  enabled: false
+  host: "localhost"
+  port: 1883
+  secretName: ""
+  clientId: ""
+
+apiTokenSecretName: ""
+
+# entrypoint hardcodes --http-port 3000 --ws-port 3001 --ui-path /app/ui
+service:
+  http:
+    type: NodePort
+    port: 3000
+    nodePort: 31801
+  udp:
+    type: NodePort
+    port: 5005
+    nodePort: 31805
+
+resources: {}

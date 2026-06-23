@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ruview.fullname" . }}-udp
+  labels:
+    app.kubernetes.io/name: {{ include "ruview.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  type: {{ .Values.service.udp.type }}
+  ports:
+    - port: {{ .Values.service.udp.port }}
+      targetPort: {{ .Values.service.udp.port }}
+      protocol: UDP
+      name: udp-csi
+      {{- if .Values.service.udp.nodePort }}
+      nodePort: {{ .Values.service.udp.nodePort }}
+      {{- end }}
+  selector:
+    app.kubernetes.io/name: {{ include "ruview.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ruview.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "ruview.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "ruview.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "ruview.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      {{- if .Values.image.imagePullSecretName }}
+      imagePullSecrets:
+        - name: {{ .Values.image.imagePullSecretName }}
+      {{- end }}
+      containers:
+        - name: ruview
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            # entrypoint maps CSI_SOURCE → --source flag
+            - name: CSI_SOURCE
+              value: {{ .Values.sensing.source | quote }}
+            # Needed when binding 0.0.0.0 without a bearer token (issue #864)
+            - name: RUVIEW_ALLOW_UNAUTHENTICATED
+              value: {{ .Values.sensing.allowUnauthenticated | quote }}
+            {{- if .Values.sensing.allowedHosts }}
+            - name: SENSING_ALLOWED_HOSTS
+              value: {{ .Values.sensing.allowedHosts | quote }}
+            {{- end }}
+            {{- if .Values.mqtt.clientId }}
+            - name: RUVIEW_MQTT_CLIENT_ID
+              value: {{ .Values.mqtt.clientId | quote }}
+            {{- end }}
+            {{- if .Values.mqtt.enabled }}
+            - name: RUVIEW_MQTT
+              value: "true"
+            - name: RUVIEW_MQTT_HOST
+              value: {{ .Values.mqtt.host | quote }}
+            - name: RUVIEW_MQTT_PORT
+              value: {{ .Values.mqtt.port | quote }}
+            {{- end }}
+            {{- if .Values.mqtt.prefix }}
+            - name: RUVIEW_MQTT_PREFIX
+              value: {{ .Values.mqtt.prefix | quote }}
+            {{- end }}
+          {{- if or .Values.mqtt.secretName .Values.apiTokenSecretName }}
+          envFrom:
+            {{- if .Values.mqtt.secretName }}
+            - secretRef:
+                name: {{ .Values.mqtt.secretName }}
+            {{- end }}
+            {{- if .Values.apiTokenSecretName }}
+            - secretRef:
+                name: {{ .Values.apiTokenSecretName }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.http.port }}
+              protocol: TCP
+            - name: udp-csi
+              containerPort: {{ .Values.service.udp.port }}
+              protocol: UDP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
