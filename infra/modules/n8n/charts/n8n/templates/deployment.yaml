@@ -50,6 +50,8 @@ spec:
             - name: N8N_WEBHOOK_URL
               value: {{ .Values.env.webhookUrl | quote }}
             {{- end }}
+            - name: N8N_RUNNERS_ENABLED
+              value: "false"
           ports:
             - containerPort: {{ .Values.service.port }}
               name: http
