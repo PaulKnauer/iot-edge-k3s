@@ -59,7 +59,16 @@ variable "storage_access_mode" {
 
 variable "resources" {
   type    = map(any)
-  default = {}
+  default = {
+    requests = {
+      memory = "128Mi"
+      cpu    = "100m"
+    }
+    limits = {
+      memory = "512Mi"
+      cpu    = "500m"
+    }
+  }
 }
 
 variable "credential_secret" {
