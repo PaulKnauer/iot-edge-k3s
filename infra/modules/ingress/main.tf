@@ -57,6 +57,10 @@ resource "null_resource" "cert_and_ingress" {
     authelia_namespace  = var.authelia_namespace
     sonos_mcp_namespace = var.sonos_mcp_namespace
     sonos_mcp_hosts     = join(",", concat(["sonos-mcp.${var.domain}"], var.sonos_mcp_extra_hosts))
+    # Re-run the kubectl apply whenever the rendered manifests in this module
+    # change (e.g. ingress annotations), so edits here reconcile via terragrunt
+    # instead of requiring a manual taint/replace.
+    manifests_hash = filesha256("${path.module}/main.tf")
   }
 
   provisioner "local-exec" {
@@ -108,8 +112,8 @@ metadata:
   namespace: ${var.clock_server_namespace}
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local/api/authz/auth-request"
-    nginx.ingress.kubernetes.io/auth-signin: "https://authelia.${var.domain}:${var.https_node_port}/?rd=https://$http_host:${var.https_node_port}$request_uri"
+    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local:9091/api/authz/auth-request"
+    nginx.ingress.kubernetes.io/auth-signin: "https://authelia.${var.domain}:${var.https_node_port}/?rd=https://\$host:${var.https_node_port}\$request_uri"
     nginx.ingress.kubernetes.io/auth-response-headers: "Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 spec:
   ingressClassName: nginx
@@ -141,8 +145,8 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local/api/authz/auth-request"
-    nginx.ingress.kubernetes.io/auth-signin: "https://authelia.${var.domain}:${var.https_node_port}/?rd=https://$http_host:${var.https_node_port}$request_uri"
+    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local:9091/api/authz/auth-request"
+    nginx.ingress.kubernetes.io/auth-signin: "https://authelia.${var.domain}:${var.https_node_port}/?rd=https://\$host:${var.https_node_port}\$request_uri"
     nginx.ingress.kubernetes.io/auth-response-headers: "Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 spec:
   ingressClassName: nginx
