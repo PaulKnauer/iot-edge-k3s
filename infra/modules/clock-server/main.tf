@@ -104,4 +104,11 @@ resource "helm_release" "clock_server" {
     kubernetes_secret_v1.registry_pull_secret,
     kubernetes_secret_v1.clock_server_auth,
   ]
+
+  lifecycle {
+    precondition {
+      condition     = length(local.auth_secret_data) > 0
+      error_message = "clock-server requires API auth credentials. Set CLOCK_SERVER_API_AUTH_CREDENTIALS or CLOCK_SERVER_API_AUTH_TOKEN before planning or applying this module."
+    }
+  }
 }

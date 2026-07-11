@@ -11,6 +11,7 @@ make apply-k3s
 make apply-longhorn
 make apply-registry
 make apply-mqtt
+export CLOCK_SERVER_API_AUTH_CREDENTIALS="ops|replace-me|*"
 make apply-clock-server
 make apply-cert-manager
 make apply-authelia
@@ -30,6 +31,10 @@ read -rsp "Authelia OIDC test-client secret: " AUTHELIA_OIDC_CLIENT_SECRET; echo
 export TF_VAR_authelia_oidc_client_secret_hash="$(docker run --rm authelia/authelia:4.38.9 authelia crypto hash generate pbkdf2 --variant sha512 --password "$AUTHELIA_OIDC_CLIENT_SECRET" | awk '/Digest:/ {print $2}')"
 unset AUTHELIA_OIDC_CLIENT_SECRET
 ```
+
+`clock-server` will not deploy without either `CLOCK_SERVER_API_AUTH_CREDENTIALS`
+or `CLOCK_SERVER_API_AUTH_TOKEN`. Prefer `CLOCK_SERVER_API_AUTH_CREDENTIALS`
+using the format `id|token|scope`, for example `ops|replace-me|*`.
 
 ## Verify
 - kubeconfig written to: infra/.kube/home-k3s.yaml
