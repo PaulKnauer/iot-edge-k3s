@@ -91,9 +91,9 @@ resource "helm_release" "ruview" {
         imagePullSecretName = var.image_pull_secret_name
       }
       sensing = {
-        source                = var.csi_source
-        allowUnauthenticated  = var.allow_unauthenticated
-        allowedHosts          = var.allowed_hosts
+        source               = var.csi_source
+        allowUnauthenticated = var.allow_unauthenticated
+        allowedHosts         = var.allowed_hosts
       }
       mqtt = {
         enabled    = var.mqtt_enabled
@@ -119,8 +119,8 @@ resource "helm_release" "ruview" {
     })
   ]
 
-  timeout          = var.helm_timeout_seconds
-  cleanup_on_fail  = true
+  timeout         = var.helm_timeout_seconds
+  cleanup_on_fail = true
 
   depends_on = [
     kubernetes_namespace_v1.ruview,

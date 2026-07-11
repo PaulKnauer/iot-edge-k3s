@@ -58,7 +58,7 @@ variable "storage_access_mode" {
 }
 
 variable "resources" {
-  type    = map(any)
+  type = map(any)
   default = {
     requests = {
       memory = "128Mi"
