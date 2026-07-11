@@ -19,7 +19,7 @@ inputs = {
 
   namespace              = "clock"
   image_repository       = "192.168.2.201:32000/clock-server"
-  image_tag              = "0.0.1"
+  image_tag              = "0.0.2"
   image_pull_policy      = "Always"
   image_pull_secret_name = get_env("REGISTRY_PULL_SECRET_NAME", "")
 
@@ -30,8 +30,8 @@ inputs = {
   registry_username = get_env("REGISTRY_USERNAME", "")
   registry_password = get_env("REGISTRY_PASSWORD", "")
 
-  # Clock-server requires one of these:
-  # export CLOCK_SERVER_API_AUTH_CREDENTIALS="user:password"
+  # Clock-server requires one of these before plan/apply:
+  # export CLOCK_SERVER_API_AUTH_CREDENTIALS="ops|some-token|*"
   # or
   # export CLOCK_SERVER_API_AUTH_TOKEN="some-token"
   auth_secret_name     = "clock-server-auth"
