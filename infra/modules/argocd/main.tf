@@ -28,12 +28,4 @@ resource "helm_release" "argocd" {
   ]
 
   timeout = var.helm_timeout_seconds
-
-  # Don't delete CRDs on destroy so existing Applications survive
-  set = [
-    {
-      name  = "crds.keep"
-      value = "true"
-    }
-  ]
 }

@@ -38,8 +38,47 @@ resource "helm_release" "registry" {
         size         = var.storage_size
         accessMode   = var.storage_access_mode
       }
+      updateStrategy = {
+        type = "Recreate"
+      }
       secrets = {
         htpasswd = var.htpasswd
+      }
+      configData = {
+        version = 0.1
+        log = {
+          fields = {
+            service = "registry"
+          }
+        }
+        storage = {
+          cache = {
+            blobdescriptor = "inmemory"
+          }
+          delete = {
+            enabled = true
+          }
+        }
+        http = {
+          addr = ":5000"
+          headers = {
+            X-Content-Type-Options = ["nosniff"]
+          }
+          debug = {
+            addr = ":5001"
+            prometheus = {
+              enabled = false
+              path    = "/metrics"
+            }
+          }
+        }
+        health = {
+          storagedriver = {
+            enabled   = true
+            interval  = "10s"
+            threshold = 3
+          }
+        }
       }
     })
   ]

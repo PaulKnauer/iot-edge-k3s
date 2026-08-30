@@ -1,0 +1,41 @@
+fullnameOverride: ""
+
+image:
+  repository: mqtt-mcp-server
+  tag: latest
+  pullPolicy: IfNotPresent
+  imagePullSecretName: ""
+
+service:
+  type: NodePort
+  port: 8000
+  nodePort: 31882
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: mqtt-mcp.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+config:
+  transport: http
+  httpHost: "0.0.0.0"
+  httpPort: "8000"
+  logLevel: INFO
+  brokerUrl: "mqtt://mosquitto.mqtt.svc.cluster.local:1883"
+  brokerUsername: ""
+  topicPrefix: "clocks/commands"
+  authMode: "none"
+  restBaseUrl: "http://clock-server-clock-server.clock.svc.cluster.local:8080"
+  restForwardProtoHttps: "true"
+  restTimeoutSeconds: "5.0"
+
+secret:
+  brokerPassword: ""
+  authToken: ""
+  authCredentials: ""
+  restAuthToken: ""

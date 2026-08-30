@@ -1,7 +1,7 @@
 TERRAGRUNT=terragrunt
 ROOT=infra
 
-.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn plan-nodered apply-nodered plan-registry apply-registry plan-clock-server apply-clock-server plan-cert-manager apply-cert-manager plan-ingress apply-ingress plan-qdrant apply-qdrant plan-n8n apply-n8n plan-authelia apply-authelia plan-sonos-mcp apply-sonos-mcp plan-argocd apply-argocd plan-ruview apply-ruview destroy-k3s destroy-mqtt destroy-longhorn destroy-nodered destroy-registry destroy-clock-server destroy-ingress destroy-cert-manager destroy-qdrant destroy-n8n destroy-authelia destroy-sonos-mcp destroy-argocd destroy-ruview
+.PHONY: fmt plan-k3s apply-k3s plan-mqtt apply-mqtt plan-longhorn apply-longhorn plan-nodered apply-nodered plan-registry apply-registry plan-clock-server apply-clock-server plan-cert-manager apply-cert-manager plan-ingress apply-ingress plan-qdrant apply-qdrant plan-n8n apply-n8n plan-authelia apply-authelia plan-sonos-mcp apply-sonos-mcp plan-mqtt-mcp apply-mqtt-mcp plan-argocd apply-argocd plan-ruview apply-ruview plan-hindsight apply-hindsight destroy-k3s destroy-mqtt destroy-longhorn destroy-nodered destroy-registry destroy-clock-server destroy-ingress destroy-cert-manager destroy-qdrant destroy-n8n destroy-authelia destroy-sonos-mcp destroy-mqtt-mcp destroy-argocd destroy-ruview destroy-hindsight
 
 fmt:
 	cd $(ROOT) && $(TERRAGRUNT) hcl format
@@ -115,6 +115,15 @@ apply-sonos-mcp:
 destroy-sonos-mcp:
 	cd $(ROOT)/live/home/sonos-mcp && $(TERRAGRUNT) destroy
 
+plan-mqtt-mcp:
+	cd $(ROOT)/live/home/mqtt-mcp && $(TERRAGRUNT) plan
+
+apply-mqtt-mcp:
+	cd $(ROOT)/live/home/mqtt-mcp && $(TERRAGRUNT) apply
+
+destroy-mqtt-mcp:
+	cd $(ROOT)/live/home/mqtt-mcp && $(TERRAGRUNT) destroy
+
 plan-argocd:
 	cd $(ROOT)/live/home/argocd && $(TERRAGRUNT) plan
 
@@ -132,3 +141,12 @@ apply-ruview:
 
 destroy-ruview:
 	cd $(ROOT)/live/home/ruview && $(TERRAGRUNT) destroy
+
+plan-hindsight:
+	cd $(ROOT)/live/home/hindsight && $(TERRAGRUNT) plan
+
+apply-hindsight:
+	cd $(ROOT)/live/home/hindsight && $(TERRAGRUNT) apply
+
+destroy-hindsight:
+	cd $(ROOT)/live/home/hindsight && $(TERRAGRUNT) destroy

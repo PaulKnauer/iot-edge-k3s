@@ -38,6 +38,7 @@ make plan-sonos-mcp    # plan Sonos MCP server
 | Clock Server | 31881 | `infra/modules/clock-server/` |
 | Authelia | 31917 | `infra/modules/authelia/` |
 | Sonos MCP | 31800 | `infra/modules/sonos-mcp/` |
+| MQTT MCP | 31882 | `infra/modules/mqtt-mcp/` |
 | cert-manager | — | `infra/modules/cert-manager/` |
 | Longhorn | — | `infra/modules/longhorn/` |
 | Node-RED | — | `infra/modules/nodered/` |

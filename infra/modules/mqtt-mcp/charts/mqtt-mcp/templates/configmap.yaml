@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mqtt-mcp.fullname" . }}
+  labels:
+    {{- include "mqtt-mcp.labels" . | nindent 4 }}
+data:
+  MQTT_MCP_TRANSPORT: {{ .Values.config.transport | quote }}
+  MQTT_MCP_HTTP_HOST: {{ .Values.config.httpHost | quote }}
+  MQTT_MCP_HTTP_PORT: {{ .Values.config.httpPort | quote }}
+  MQTT_MCP_LOG_LEVEL: {{ .Values.config.logLevel | quote }}
+  MQTT_MCP_BROKER_URL: {{ .Values.config.brokerUrl | quote }}
+  MQTT_MCP_BROKER_USERNAME: {{ .Values.config.brokerUsername | default "" | quote }}
+  MQTT_MCP_TOPIC_PREFIX: {{ .Values.config.topicPrefix | quote }}
+  MQTT_MCP_AUTH_MODE: {{ .Values.config.authMode | quote }}
+  MQTT_MCP_REST_BASE_URL: {{ .Values.config.restBaseUrl | quote }}
+  MQTT_MCP_REST_FORWARD_PROTO_HTTPS: {{ .Values.config.restForwardProtoHttps | quote }}
+  MQTT_MCP_REST_TIMEOUT_SECONDS: {{ .Values.config.restTimeoutSeconds | quote }}

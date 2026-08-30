@@ -7,7 +7,7 @@ dependency "k3s" {
 }
 
 dependencies {
-  paths = ["../cert-manager", "../clock-server", "../nodered", "../registry", "../authelia", "../sonos-mcp"]
+  paths = ["../cert-manager", "../clock-server", "../registry", "../authelia", "../sonos-mcp", "../mqtt-mcp", "../hindsight"]
 }
 
 terraform {
@@ -22,13 +22,12 @@ inputs = {
 
   node_dns_names        = ["rpi4-1.local"]
   sonos_mcp_extra_hosts = ["rpi4-1.local"]
+  mqtt_mcp_extra_hosts  = ["rpi4-1.local"]
 
   https_node_port = 30443
   http_node_port  = 30080
 
-  # ArgoCD ingress — service name matches Helm release "argocd" + chart "argo-cd"
-  argocd_namespace = "argocd"
-  argocd_service   = "argocd-argo-cd-server"
-  argocd_port      = 80
-  argocd_grpc_port = 443
+  hindsight_namespace = "hindsight"
+  hindsight_web_host  = get_env("HINDSIGHT_WEB_HOST", "hindsight.home.lab")
+  hindsight_api_host  = get_env("HINDSIGHT_API_HOST", "hindsight-api.home.lab")
 }

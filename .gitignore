@@ -7,3 +7,7 @@ kubeconfig*
 *.pem
 *.key
 .DS_Store
+
+# Local secrets sourced before `make apply-*` (never commit)
+.secrets.env
+**/.secrets.env

@@ -57,6 +57,11 @@ resource "null_resource" "cert_and_ingress" {
     authelia_namespace  = var.authelia_namespace
     sonos_mcp_namespace = var.sonos_mcp_namespace
     sonos_mcp_hosts     = join(",", concat(["sonos-mcp.${var.domain}"], var.sonos_mcp_extra_hosts))
+    mqtt_mcp_namespace  = var.mqtt_mcp_namespace
+    mqtt_mcp_hosts      = join(",", concat(["mqtt-mcp.${var.domain}"], var.mqtt_mcp_extra_hosts))
+    hindsight_namespace = var.hindsight_namespace
+    hindsight_web_host  = var.hindsight_web_host
+    hindsight_api_host  = var.hindsight_api_host
     # Re-run the kubectl apply whenever the rendered manifests in this module
     # change (e.g. ingress annotations), so edits here reconcile via terragrunt
     # instead of requiring a manual taint/replace.
@@ -86,12 +91,12 @@ spec:
     kind: ClusterIssuer
   dnsNames:
     - clock.${var.domain}
-    - nodered.${var.domain}
     - registry.${var.domain}
     - authelia.${var.domain}
     - sonos-mcp.${var.domain}
-    - argocd.${var.domain}
-    - grpc.argocd.${var.domain}
+    - mqtt-mcp.${var.domain}
+    - ${var.hindsight_web_host}
+    - ${var.hindsight_api_host}
 %{for name in var.node_dns_names~}
     - ${name}
 %{endfor~}
@@ -132,39 +137,6 @@ spec:
                 name: ${var.clock_server_service}
                 port:
                   number: ${var.clock_server_port}
-EOF
-
-      echo "Applying nodered Ingress..."
-      kubectl apply -f - <<EOF
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: nodered
-  namespace: ${var.nodered_namespace}
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-    nginx.ingress.kubernetes.io/auth-url: "http://authelia.${var.authelia_namespace}.svc.cluster.local:9091/api/authz/auth-request"
-    nginx.ingress.kubernetes.io/auth-signin: "https://authelia.${var.domain}:${var.https_node_port}/?rd=https://\$host:${var.https_node_port}\$request_uri"
-    nginx.ingress.kubernetes.io/auth-response-headers: "Remote-User,Remote-Groups,Remote-Name,Remote-Email"
-spec:
-  ingressClassName: nginx
-  tls:
-    - hosts:
-        - nodered.${var.domain}
-      secretName: homelab-tls
-  rules:
-    - host: nodered.${var.domain}
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: ${var.nodered_service}
-                port:
-                  number: ${var.nodered_port}
 EOF
 
       echo "Applying registry Ingress..."
@@ -260,79 +232,124 @@ spec:
 %{endfor~}
 EOF
 
-      echo "Applying argocd Ingress..."
+      echo "Applying mqtt-mcp Ingress..."
       kubectl apply -f - <<EOF
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: argocd-server
-  namespace: ${var.argocd_namespace}
+  name: mqtt-mcp
+  namespace: ${var.mqtt_mcp_namespace}
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - argocd.${var.domain}
+%{for host in concat(["mqtt-mcp.${var.domain}"], var.mqtt_mcp_extra_hosts)~}
+        - ${host}
+%{endfor~}
       secretName: homelab-tls
   rules:
-    - host: argocd.${var.domain}
+%{for host in concat(["mqtt-mcp.${var.domain}"], var.mqtt_mcp_extra_hosts)~}
+    - host: ${host}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: ${var.argocd_service}
+                name: ${var.mqtt_mcp_service}
                 port:
-                  number: ${var.argocd_port}
+                  number: ${var.mqtt_mcp_port}
+%{endfor~}
 EOF
 
-      echo "Applying argocd gRPC Ingress (for CLI)..."
-      kubectl apply -f - <<EOF
+      if kubectl get ingress hindsight -n ${var.hindsight_namespace} >/dev/null 2>&1; then
+        echo "Hindsight ingress already managed in-cluster; skipping duplicate hindsight-web/hindsight-api apply."
+      else
+        echo "Applying hindsight web Ingress..."
+        kubectl apply -f - <<EOF
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: argocd-grpc
-  namespace: ${var.argocd_namespace}
+  name: hindsight-web
+  namespace: ${var.hindsight_namespace}
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "GRPCS"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - grpc.argocd.${var.domain}
+        - ${var.hindsight_web_host}
       secretName: homelab-tls
   rules:
-    - host: grpc.argocd.${var.domain}
+    - host: ${var.hindsight_web_host}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: ${var.argocd_service}
+                name: hindsight-hindsight-control-plane
                 port:
-                  number: ${var.argocd_grpc_port}
+                  number: 3000
 EOF
+
+        echo "Applying hindsight API Ingress..."
+        kubectl apply -f - <<EOF
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hindsight-api
+  namespace: ${var.hindsight_namespace}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ${var.hindsight_api_host}
+      secretName: homelab-tls
+  rules:
+    - host: ${var.hindsight_api_host}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hindsight-hindsight-api
+                port:
+                  number: 8888
+EOF
+      fi
 
       echo "HTTPS ingress setup complete."
       echo ""
       echo "Add to /etc/hosts on each client machine:"
-      echo "  ${var.node_ip}  clock.${var.domain} nodered.${var.domain} registry.${var.domain} authelia.${var.domain} sonos-mcp.${var.domain} argocd.${var.domain} grpc.argocd.${var.domain}"
+      echo "  ${var.node_ip}  clock.${var.domain} registry.${var.domain} authelia.${var.domain} sonos-mcp.${var.domain} mqtt-mcp.${var.domain} ${var.hindsight_web_host} ${var.hindsight_api_host}"
       echo ""
       echo "Access via:"
       echo "  https://authelia.${var.domain}:${var.https_node_port}     (login portal)"
       echo "  https://clock.${var.domain}:${var.https_node_port}        (protected by Authelia)"
-      echo "  https://nodered.${var.domain}:${var.https_node_port}      (protected by Authelia)"
       echo "  https://registry.${var.domain}:${var.https_node_port}"
       echo "  https://sonos-mcp.${var.domain}:${var.https_node_port}    (MCP SSE endpoint)"
-      echo "  https://argocd.${var.domain}:${var.https_node_port}       (GitOps UI - login: admin)"
-      echo "  grpc.argocd.${var.domain}:${var.https_node_port}          (ArgoCD CLI endpoint)"
+      echo "  https://mqtt-mcp.${var.domain}:${var.https_node_port}/mcp (Clock MCP Streamable HTTP endpoint)"
+      echo "  https://${var.hindsight_web_host}:${var.https_node_port}  (Hindsight Control Plane UI)"
+      echo "  https://${var.hindsight_api_host}:${var.https_node_port}  (Hindsight API)"
 %{for host in var.sonos_mcp_extra_hosts~}
       echo "  https://${host}:${var.https_node_port}/mcp (Sonos MCP via extra host)"
+%{endfor~}
+%{for host in var.mqtt_mcp_extra_hosts~}
+      echo "  https://${host}:${var.https_node_port}/mcp (Clock MCP via extra host)"
 %{endfor~}
       echo ""
       echo "Export CA cert to trust it:"

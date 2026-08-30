@@ -117,6 +117,26 @@ variable "sonos_mcp_extra_hosts" {
   default = []
 }
 
+variable "mqtt_mcp_namespace" {
+  type    = string
+  default = "mqtt-mcp"
+}
+
+variable "mqtt_mcp_service" {
+  type    = string
+  default = "mqtt-mcp"
+}
+
+variable "mqtt_mcp_port" {
+  type    = number
+  default = 8000
+}
+
+variable "mqtt_mcp_extra_hosts" {
+  type    = list(string)
+  default = []
+}
+
 variable "argocd_namespace" {
   type    = string
   default = "argocd"
@@ -135,4 +155,19 @@ variable "argocd_port" {
 variable "argocd_grpc_port" {
   type    = number
   default = 443
+}
+
+variable "hindsight_namespace" {
+  type    = string
+  default = "hindsight"
+}
+
+variable "hindsight_web_host" {
+  type    = string
+  default = "hindsight.home.lab"
+}
+
+variable "hindsight_api_host" {
+  type    = string
+  default = "hindsight-api.home.lab"
 }
