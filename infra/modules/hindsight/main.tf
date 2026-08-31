@@ -17,7 +17,7 @@ provider "helm" {
 locals {
   api_env = merge(
     {
-      HINDSIGHT_API_WORKER_ID             = var.worker_id
+      HINDSIGHT_API_WORKER_ID            = var.worker_id
       HINDSIGHT_API_STARTUP_WAIT_SECONDS = "600"
     },
     var.llm_provider != "" ? { HINDSIGHT_API_LLM_PROVIDER = var.llm_provider } : {},

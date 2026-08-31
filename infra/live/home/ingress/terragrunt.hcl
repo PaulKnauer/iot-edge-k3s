@@ -28,6 +28,6 @@ inputs = {
   http_node_port  = 30080
 
   hindsight_namespace = "hindsight"
-  hindsight_web_host  = get_env("HINDSIGHT_WEB_HOST", "hindsight.home.lab")
-  hindsight_api_host  = get_env("HINDSIGHT_API_HOST", "hindsight-api.home.lab")
+  hindsight_web_host  = get_env("HINDSIGHT_WEB_HOST", "hindsight.k3s.home.arpa")
+  hindsight_api_host  = get_env("HINDSIGHT_API_HOST", "hindsight-api.k3s.home.arpa")
 }

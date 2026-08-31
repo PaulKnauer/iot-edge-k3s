@@ -104,12 +104,12 @@ variable "ingress_class_name" {
 
 variable "web_host" {
   type    = string
-  default = "hindsight.home.lab"
+  default = "hindsight.k3s.home.arpa"
 }
 
 variable "api_host" {
   type    = string
-  default = "hindsight-api.home.lab"
+  default = "hindsight-api.k3s.home.arpa"
 }
 
 variable "ingress_proxy_body_size" {

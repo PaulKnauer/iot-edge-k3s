@@ -41,8 +41,8 @@ inputs = {
 
   ingress_enabled    = true
   ingress_class_name = "nginx"
-  web_host           = get_env("HINDSIGHT_WEB_HOST", "hindsight.home.lab")
-  api_host           = get_env("HINDSIGHT_API_HOST", "hindsight-api.home.lab")
+  web_host           = get_env("HINDSIGHT_WEB_HOST", "hindsight.k3s.home.arpa")
+  api_host           = get_env("HINDSIGHT_API_HOST", "hindsight-api.k3s.home.arpa")
 
   ingress_proxy_body_size            = get_env("HINDSIGHT_INGRESS_PROXY_BODY_SIZE", "100m")
   ingress_proxy_read_timeout_seconds = tonumber(get_env("HINDSIGHT_INGRESS_PROXY_READ_TIMEOUT_SECONDS", "600"))
