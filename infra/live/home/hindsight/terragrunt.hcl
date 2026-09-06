@@ -39,6 +39,10 @@ inputs = {
   postgresql_password = get_env("HINDSIGHT_POSTGRESQL_PASSWORD", "hindsight")
   postgresql_database = get_env("HINDSIGHT_POSTGRESQL_DATABASE", "hindsight")
 
+  nodeport_enabled        = true
+  api_node_port           = 31888
+  control_plane_node_port = 31889
+
   ingress_enabled    = true
   ingress_class_name = "nginx"
   web_host           = get_env("HINDSIGHT_WEB_HOST", "hindsight.k3s.home.arpa")
