@@ -21,7 +21,7 @@ inputs = {
 
   # Image built and pushed to local registry
   image_repository  = "192.168.2.201:32000/soniq-mcp"
-  image_tag         = "v0.6.0"
+  image_tag         = "v0.7.0"
   image_pull_policy = "Always"
 
   # Registry auth
