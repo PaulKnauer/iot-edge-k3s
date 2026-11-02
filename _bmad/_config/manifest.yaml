@@ -1,71 +1,60 @@
 installation:
   version: 6.12.4
   installDate: 2026-06-22T21:13:02.987Z
-  lastUpdated: 2026-11-02T15:40:33.910Z
+  lastUpdated: 2026-11-02T15:44:31.684Z
   installShims: false
 modules:
   - name: core
     version: 6.12.4
     installDate: 2026-06-22T21:13:01.955Z
-    lastUpdated: 2026-11-02T15:40:33.904Z
+    lastUpdated: 2026-11-02T15:44:31.678Z
     source: built-in
     npmPackage: null
     repoUrl: null
   - name: bmm
     version: 6.12.4
     installDate: 2026-06-22T21:13:01.881Z
-    lastUpdated: 2026-11-02T15:40:33.904Z
+    lastUpdated: 2026-11-02T15:44:31.679Z
     source: built-in
     npmPackage: null
     repoUrl: null
-  - name: tea
-    version: v1.19.0
-    installDate: 2026-06-22T21:13:02.848Z
-    lastUpdated: 2026-11-02T15:40:33.905Z
-    source: external
-    npmPackage: bmad-method-test-architecture-enterprise
-    repoUrl: https://github.com/bmad-code-org/bmad-method-test-architecture-enterprise
-    channel: pinned
-    sha: 8734d51f24071ddbcb3617390b5fcddb4128ef77
-  - name: bmb
-    version: v2.2.2
-    installDate: 2026-06-22T21:13:02.283Z
-    lastUpdated: 2026-11-02T15:40:33.906Z
-    source: external
-    npmPackage: bmad-builder
-    repoUrl: https://github.com/bmad-code-org/bmad-builder
-    channel: stable
-    sha: 4a1422274a2acb0fb0ec0511753da6263948f072
-  - name: automator
-    version: main
-    installDate: 2026-06-22T21:13:02.135Z
-    lastUpdated: 2026-11-02T15:40:33.907Z
-    source: external
-    npmPackage: bmad-story-automator
-    repoUrl: https://github.com/bmad-code-org/bmad-automator
-    channel: next
-    sha: 0b94fd7bec8672f5bc384123f1f76e1daae1dc2b
   - name: cis
     version: v0.3.2
     installDate: 2026-06-22T21:13:02.002Z
-    lastUpdated: 2026-11-02T15:40:33.908Z
+    lastUpdated: 2026-11-02T15:44:31.680Z
     source: external
     npmPackage: bmad-creative-intelligence-suite
     repoUrl: https://github.com/bmad-code-org/bmad-module-creative-intelligence-suite
     channel: pinned
     sha: 97298b22fee1c7e482710d3a8414adb5cfccccd9
+  - name: tea
+    version: v1.19.0
+    installDate: 2026-06-22T21:13:02.848Z
+    lastUpdated: 2026-11-02T15:44:31.681Z
+    source: external
+    npmPackage: bmad-method-test-architecture-enterprise
+    repoUrl: https://github.com/bmad-code-org/bmad-method-test-architecture-enterprise
+    channel: pinned
+    sha: 8734d51f24071ddbcb3617390b5fcddb4128ef77
   - name: bmad-loop
     version: v0.13.2
     installDate: 2026-07-07T15:12:29.590Z
-    lastUpdated: 2026-11-02T15:40:33.910Z
+    lastUpdated: 2026-11-02T15:44:31.683Z
     source: external
     npmPackage: null
     repoUrl: https://github.com/bmad-code-org/bmad-loop
     channel: stable
     sha: 4a5c45390ff46c0fc28d316004ffe0ed7c8eea60
+  - name: automator
+    version: main
+    installDate: 2026-06-22T21:13:02.135Z
+    lastUpdated: 2026-11-02T15:44:31.684Z
+    source: external
+    npmPackage: bmad-story-automator
+    repoUrl: https://github.com/bmad-code-org/bmad-automator
+    channel: next
+    sha: 0b94fd7bec8672f5bc384123f1f76e1daae1dc2b
 ides:
   - claude-code
   - codex
-  - goose
-  - gemini
   - hermes
