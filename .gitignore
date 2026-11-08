@@ -7,3 +7,5 @@ kubeconfig*
 *.pem
 *.key
 .DS_Store
+**/.secrets.env
+infra/.secrets/
